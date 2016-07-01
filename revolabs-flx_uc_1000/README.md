@@ -8,4 +8,5 @@ found this device in a conference room, found the IP from an unauthenticated men
 
 ## tools
 name | description
-[bf_login.rb](bf_login.rb)| brute forces the PIN on the web interface
+-----|-------------
+[bf_login.rb](bf_login.rb) | brute forces the PIN on the web interface
