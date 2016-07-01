@@ -1,0 +1,9 @@
+# project files
+*.iml
+
+# generated files
+.DS_Store
+
+
+# temp files
+*.swp
