@@ -1,6 +1,6 @@
 # revolabs flx UC1000
 
-found this device in a conference room, found the IP from an unauthenticated menu on the dialer, and it was accessible from the 'Guest' network. it also has USB ports, so potentially available without network access.
+found this device in a conference room, found the IP from an unauthenticated menu on the dialer, which was accessible from the wireless 'Guest' network. it also has USB ports, so potentially available without network access.
 
 ## story time
 

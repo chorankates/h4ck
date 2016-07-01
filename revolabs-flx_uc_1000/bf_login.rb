@@ -36,7 +36,7 @@ def get_request(uri, pin)
   body << sprintf('<properties sys.validate-password="%s"/>', pin)
   body << '-----------------------------7da24f2e50046'
 
-  request.body = body.join("\n")
+  request.body = body.join("\r\n")
   request
 end
 
