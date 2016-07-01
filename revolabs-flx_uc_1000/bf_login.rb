@@ -1,12 +1,5 @@
 #!/usr/bin/env ruby
 ## bf_login.rb - brute force the login for the revolabs flx UC 1000
-#
-# http://<device>/app/app.js exposes:
-# sys.password:
-#  - defaultVal: "7386",
-#  - pattern: /^(\d{4,})$/,
-#
-# so when the default works, we only have to try 9998 other possibilities
 
 require 'json'
 require 'net/http'

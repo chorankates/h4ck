@@ -4,6 +4,14 @@ found this device in a conference room, found the IP from an unauthenticated men
 
 ## story time
 
+from the page that loaded when you first hit http://<device>, i noticed `app.js`
+
+in it, i found:
+```json
+ sys.password:
+  - defaultVal: "7386",
+  - pattern: /^(\d{4,})$/,
+```
 
 
 ## tools
