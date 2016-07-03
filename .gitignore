@@ -3,7 +3,7 @@
 
 # generated files
 .DS_Store
-
+*.pcap*
 
 # temp files
 *.swp

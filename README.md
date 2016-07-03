@@ -1,7 +1,7 @@
 # h4ck
 a collection of writeups and tools related to ~embedded device ~hacking
 
-shiny devices are fun, finding and poking holes in to their interface is a _lot_ of fun
+shiny devices are fun, finding and poking holes in their interface is a _lot_ of fun
 
 ## devices
 name | description | url
