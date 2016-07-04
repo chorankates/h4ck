@@ -7,4 +7,5 @@ shiny devices are fun, finding and poking holes in their interface is a _lot_ of
 name | description | url
 -----|-------------|-----
 [HooToo](http://www.hootoo.com) | there are lots of problems | [hootoo](hootoo)
+[Philips Hue](http://www.meethue.com) | device communication insecure, Ruby library/CLI to control via REST HTTP | [hued](https://github.com/chorankates/hued)
 [RevoLabs flx UC1000](http://www.revolabs.com/products/conference-phones/wired-conference-phones/flx-uc-phones/flx-uc-1000-speakerphone) | brute forcing the PIN | [revolabs-flx_uc_1000](revolabs-flx_uc_1000)
