@@ -5,13 +5,13 @@ i was initially interested in the HooToo TripMate Titan when someone on Twitter 
 
 that sounds cool - not just for the surface use cases: road trips, airplane flights, etc - but also because the features required meant the TripMate was a $39 low power, wifi enabled computer with it's own battery. <insert cheesy Zuckerberg misquote here>
 
-my goal was always to gain access to this device in way it's manufacturer hadn't intended, but what i found was a bit excessive.
+my goal was always to gain access to this device in ways it's manufacturer hadn't intended, but what i found was a bit excessive.
 
 some of the issues are as common as XSS vulnerabilities, others as serious as passing credentials/settings in plaintext over HTTP and a universally reused root password.
 
 # devices
-name | model | description | version | rooted? | services | vulnerabilities 
-----|-----|-----------|-------|-------|---------------|---------
+name|model|description|version|rooted?|services|vulnerabilities
+----|-----|-----------|-------|-------|---------------
 [TripMate Titan](http://www.hootoo.com/hootoo-tripmate-ht-tm05-wireless-router.html)|HT-TM05|NAS/WiFi bridge/battery| firmware: `2.000.022`|yes|`telnet`, `http (80, 81)`, `unknown 85, 8200)`|easily guessable default passwords, universal root password, credential exposure, data exposure, HTTP - variety
 [TripMate](http://www.hootoo.com/hootoo-tripmate-ht-tm01-wireless-router.html)|HT-TM01|NAS/WiFi bridge/battery| firmware: `2.000.022`|yes|`telnet`, `http (80, 81)`|same as TripMate Titan
 [TripMate Elite](http://www.hootoo.com/hootoo-tripmate-elite-ht-tm04-wireless-portable-router.html)|HT-TM06|NAS/WiFi bridge/battery/outlet|firmware: `2.000.004`|no|`http (80, 81)`|easily guessable default passwords, HTTP - variety
@@ -62,7 +62,7 @@ app|admin|`<empty>`|allows login to web app ([default](http://10.10.10.254))
 
 ### universal root password
 
-while not easily guessable, the `root` password is triviable to obtain:
+while not easily guessable, the `root` password is trivial to obtain:
 
 ```
 $ telnet 10.10.10.254
@@ -144,9 +144,9 @@ parameters:
 
 # TODO need to talk about GET vs POST here
 
-* `http://10.10.10.254/themes/HT-TM05/lge/us.js` - error codes to messages mapping
+* `http://10.10.10.254/themes/HT-TM05/lge/us.js` - error code to message mapping
 * when no internet connection is available, all HTTP requests are blindly 301'd to [http://10.10.10.254/app/main.html](http://10.10.10.254/app/main.html)
-* [hooto.com's 404](http://www.hootoo.com/foobarbaz) page is .. amusing
+* [hootoo.com's 404](http://www.hootoo.com/foobarbaz) page is .. amusing
 
 #### protocol.csp
 fname|opts
