@@ -30,7 +30,6 @@ name | description
     * DHCP, NTP settings
     * name displayed
     * etc
-
   * upgrade firmware - need to do more digging here
   * restart device
   * pull logs/configuration
