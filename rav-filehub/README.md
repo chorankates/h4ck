@@ -16,7 +16,7 @@ firmware|2.000.022
 features|WiFi bridge, NAS, battery
 app|[http://10.10.10.254](http://10.10.10.254)
 
-if this looks familiar.. it's because it is - this particular model/firmware combination is running a very similar 'firmware' as the [HooToo](hootoo) devices.
+if this looks familiar.. it's because it is - this particular model/firmware combination is running a very similar 'firmware' as the [HooToo](../hootoo) devices.
 
 however, as noted in the upgrade saga there, none of these devices are _exactly_ the same
 
@@ -32,14 +32,14 @@ PORT   STATE SERVICE    VERSION
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 ```
 
-like the HooToo, running 2 webservers on `80` and `81` and 'something' on `85`. when we plug a drive in, the NAS/NFS functionality lights up a few more ports:
+like the [HooToo](../hootoo), running 2 webservers on `80` and `81` and 'something' on `85`. when we plug a drive in, the NAS/NFS functionality lights up a few more ports:
 ```
 TODO add this
 ```
 
 ### 'backup'
 
-while looking through the web UI and comparing it to the HooToo, i noticed a 'Backup Settings' option.
+while looking through the web UI and comparing it to the [HooToo](../hootoo), i noticed a 'Backup Settings' option.
 
 [http://device/sysfirm.csp?fname=sysbackupform&t=timestamp](http://10.10.10.254:81/sysfirm.csp?fname=sysbackupform&t=1467949779552) downloads a file:
 ```
@@ -67,7 +67,7 @@ option lease 86400
 well it's definitely more than just settings.
 
 
-assuming that this was probably the same underlying system as the HooToo, there should be some concept of `telnetd`. searching the file found code that appeared to be /etc/rc.d load scripts:
+assuming that this was probably the same underlying system as the [HooToo](../hootoo), there should be some concept of `telnetd`. searching the file found code that appeared to be /etc/rc.d load scripts:
 ```shell
 #Modify for 3G reset not Open
 if [ ! -f /etc/checktelnetflag ]; then
@@ -97,7 +97,7 @@ using the same password for `admin` that is used in the web UI, i was able to lo
 i looked, and  again, `/etc/passwd` and `/etc/shadow` were world readable. i took the contents to my trusty GCE v16 instance, and.. cracked the root password immediately.
 
 
-yep, using the same root password has the HooToo devices here too: `20080826`
+yep, using the same root password has the [HooToo](../hootoo) devices here too: `20080826`
 
 
 however, the `/etc/passwd` contents were not the same:
@@ -189,7 +189,7 @@ given this, i think it's fair to assume that all of these devices listed [below]
 
 kicking myself for missing the 'backup' vector when looking at the HooToo devices, i took another look - and no, there was no 'Backup / Restore Settings' option in the web UI.
 
-remembering that a lot of the HooToo functionality lived behind `*.csp` `GET`s, it seemed reasonable that the backup method for the RAV-FileHub would also work for the HooToo devices. it [does](TODO add this writeup to the hootoo side so we can link to it from here).
+remembering that a lot of the HooToo functionality lived behind `*.csp` `GET`s, it seemed reasonable that the backup method for the RAV-FileHub would also work for the HooToo devices. it [does](../hootoo)
 
 
 ### complete device list
