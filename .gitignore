@@ -1,3 +1,7 @@
+
+# binary files (proprietary?)
+*.gz
+
 # project files
 *.iml
 
