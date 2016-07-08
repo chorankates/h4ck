@@ -194,6 +194,8 @@ remembering that a lot of the HooToo functionality lived behind `*.csp` `GET`s, 
 
 ### complete device list
 
+99 devices, 69 manufacturers:
+
 ```javascript
 ...
 //IOVST UIS700HD
