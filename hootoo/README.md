@@ -1,6 +1,23 @@
 hoo2
 ====
 
+- [devices](#devices)
+	- [TripMate Titan](#tripmate-titan)
+		- [nmap](#nmap)
+		- [easily guessable default passwords](#easily-guessable-default-passwords)
+		- [universal root password](#universal-root-password)
+		- [credential exposure - WiFi network and bridge](#credential-exposure-wifi-network-and-bridge)
+		- [data exposure - NAS](#data-exposure-nas)
+		- [interesting URLs](#interesting-urls)
+		  - [protocol.csp](#protocolcsp)
+	- [TripMate](#tripmate)
+		- [nmap](#nmap)
+		- [upgrading is hard](#upgrading-is-hard)
+	- [TripMate Elite](#tripmate-elite)
+		- [nmap](#nmap)
+	- [TripMate Nano](#tripmate-nano)
+		- [nmap](#nmap)
+
 i was initially interested in the HooToo TripMate Titan when someone on Twitter (thought it was @davepell, but can't find the tweet now) saying it was a great way to share battery/network/data from a single device.
 
 that sounds cool - not just for the surface use cases: road trips, airplane flights, etc - but also because the features required meant the TripMate was a $39 low power, wifi enabled computer with it's own battery. <insert cheesy Zuckerberg misquote here>
@@ -8,6 +25,8 @@ that sounds cool - not just for the surface use cases: road trips, airplane flig
 my goal was always to gain access to this device in ways it's manufacturer hadn't intended, but what i found was a bit excessive.
 
 some of the issues are as common as XSS vulnerabilities, others as serious as passing credentials/settings in plaintext over HTTP and a universally reused root password.
+
+* after testing the [rav-filehub](rav-filehub), found that calling an-api-method-not-exposed-by-the-ui would allow download of a ['backup'](http://10.10.10.254:81/sysfirm.csp?fname=sysbackupform&t=1467949779552). i haven't tried POSTing it back, but assume it would work.
 
 # devices
 name|model|description|version|rooted?|services|vulnerabilities
