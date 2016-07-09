@@ -1,12 +1,11 @@
 # RAV
 
-- [RAV](#rav)
-	- [FileHub](#filehub)
-		- [nmap](#nmap)
-		- ['backup'](#backup)
-	- [other affected devices](#other-affected-devices)
-	- ['backup' strikes again](#backup-strikes-again)
-		- [complete device list](#complete-device-list)
+- [FileHub](#filehub)
+  - [nmap](#nmap)
+  - ['backup'](#backup)
+- [other affected devices](#other-affected-devices)
+- ['backup' strikes again](#backup-strikes-again)
+  - [complete device list](#complete-device-list)
 
 ## FileHub
 name|value

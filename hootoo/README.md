@@ -30,7 +30,7 @@ some of the issues are as common as XSS vulnerabilities, others as serious as pa
 
 # devices
 name|model|description|version|rooted?|services|vulnerabilities
-----|-----|-----------|-------|-------|---------------
+----|-----|-----------|-------|-------|--------|---------------
 [TripMate Titan](http://www.hootoo.com/hootoo-tripmate-ht-tm05-wireless-router.html)|HT-TM05|NAS/WiFi bridge/battery| firmware: `2.000.022`|yes|`telnet`, `http (80, 81)`, `unknown 85, 8200)`|easily guessable default passwords, universal root password, credential exposure, data exposure, HTTP - variety
 [TripMate](http://www.hootoo.com/hootoo-tripmate-ht-tm01-wireless-router.html)|HT-TM01|NAS/WiFi bridge/battery| firmware: `2.000.022`|yes|`telnet`, `http (80, 81)`|same as TripMate Titan
 [TripMate Elite](http://www.hootoo.com/hootoo-tripmate-elite-ht-tm04-wireless-portable-router.html)|HT-TM06|NAS/WiFi bridge/battery/outlet|firmware: `2.000.004`|no|`http (80, 81)`|easily guessable default passwords, HTTP - variety
