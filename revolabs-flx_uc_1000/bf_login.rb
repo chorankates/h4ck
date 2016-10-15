@@ -82,6 +82,8 @@ end
 #
 ## main()
 
+address = ARGV.first
+
 if address.nil?
   puts sprintf('usage: %s <ipaddress/range>', __FILE__)
   puts sprintf('  %s 192.168.1.42', __FILE__)
@@ -135,8 +137,8 @@ targets.each do |target|
     begin
       puts sprintf('  trying pin[%s]', pin)
 
-      response = check_pin(url, pin)
-      responses << { :ip => target, :pin => pin, :results => response }
+      response = app.check_pin(url, pin)
+      app.responses << { :ip => target, :pin => pin, :results => response }
 
       if response
         app.add_pin_to_db(target, pin)
@@ -149,20 +151,20 @@ targets.each do |target|
 
     rescue => e
       puts sprintf('ERROR: something bad happened on pin[%s]: [%s:%s]', pin, e.class, e.message)
-      errors << { :exception => e, :pin => pin }
+      app.errors << { :exception => e, :pin => pin }
     end
 
   end
 
-  unless errors.empty?
-    errors.each do |e|
+  unless app.errors.empty?
+    app.errors.each do |e|
       puts sprintf('ERROR: pin[%s] trace[%s]', e[:pin], e[:exception])
     end
 
-    puts sprintf('ERROR: [%d] total errors', errors.size)
+    puts sprintf('ERROR: [%d] total errors', app.errors.size)
   else
     # TODO this is going to get lost in the console output when running against multiple targets -- should we stop printing the PINs attempted?
-    puts sprintf('tested[%s] PINs, found correct one[%s]', responses.size, )
+    puts sprintf('tested[%s] PINs, found correct one[%s]', app.responses.size, )
   end
 
 end
