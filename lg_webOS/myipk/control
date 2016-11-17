@@ -1,0 +1,12 @@
+Package: myipk
+Version: 1.0
+Description: application to meddle with LG webOS TV
+Section: extras
+Priority: optional
+Maintainer: conor
+License: CLOSED
+Architecture: all
+OE: myipk
+Homepage: unknown
+#Depends: python python-distutils python-pyserial python-curses python-mmap python-ctypes
+Source:  N/A
