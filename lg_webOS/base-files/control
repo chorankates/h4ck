@@ -1,0 +1,11 @@
+Package: base-files
+#Version: 157.2-r8532
+Version: 158.2-r8532
+Description: application to meddle with LG webOS TV
+Depends: libc, netifd, procd, jsonfilter, usign
+Section: base
+Essential: yes
+Maintainer: conor
+License: CLOSED
+Architecture: all
+Source: package/base-files
