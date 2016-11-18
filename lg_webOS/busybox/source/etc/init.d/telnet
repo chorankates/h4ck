@@ -1,0 +1,15 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006-2011 OpenWrt.org
+## modified to not redirect to ssh if available, just start telnet
+
+START=50
+
+USE_PROCD=1
+PROG=/usr/sbin/telnetd
+
+has_root_pwd=() {
+start_service() {
+  procd_open_instance
+  procd_set_param_command "$PROG" -F -l /bin/login.sh
+  procd_close_instance
+}

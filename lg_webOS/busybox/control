@@ -1,0 +1,10 @@
+Package: busybox
+Version: 1.24.2-1
+Description: application to meddle with LG webOS TV
+Depends: libc
+Section: base
+Essential: yes
+Maintainer: conor
+License: CLOSED
+Architecture: all
+Source: package/utils/busybox

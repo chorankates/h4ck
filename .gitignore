@@ -1,6 +1,10 @@
 
 # binary files (proprietary?)
 *.gz
+*.zip
+*.sth
+*crx*
+
 
 # project files
 *.iml
@@ -8,6 +12,8 @@
 # generated files
 .DS_Store
 *.pcap*
+debian-binary
+*.ipk
 
 # temp files
 *.swp
