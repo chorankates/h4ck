@@ -28,7 +28,7 @@ was rooting the device, but initial investigations showed some other interesting
 
 ### nmap
 
-from `nmap -PN -sV <device`, we get:
+from `nmap -PN -sV <device>`, we get:
 
 ```
 PORT     STATE SERVICE  VERSION
@@ -147,7 +147,134 @@ to speed this along, observe a session where the TV updated its firmware from th
 
 #### channel search
 
-foo
+when configuring the cable connections, the TV makes a number of calls:
+
+request:
+```
+GET /fts/gftsDownload.lge?biz_code=IBS&func_code=ONLINE_EPG_FILE&file_path=/ibs/online/epg_file/20161116/f_1479280636996tmsepgcrawler_merged000004417_201611160600_06_20161116070000.zip HTTP/1.1
+Host: aic-ngfts.lge.com
+Accept: */*
+```
+
+response:
+```
+HTTP/1.1 200 OK
+Server: Apache
+Content-Disposition: attachment; filename="f_1479280636996tmsepgcrawler_merged000004417_201611160600_06_20161116070000.zip"
+Content-Transfer-Encoding: binary;
+Last-Modified: Wed, 16 Nov 2016 07:25:17 GMT
+Content-Length: 135700
+Content-Type: application/octet-stream;charset=UTF-8
+Date: Wed, 16 Nov 2016 08:24:01 GMT
+Connection: keep-alive
+
+```
+
+parameters in request:
+
+parameter   |assumption
+------------|-----------
+`biz_code`  | none
+`func_code` | none
+`file_path` | none
+
+looking at the file path, if not in a chroot'd environment, potential for ~LFI - attempts thus far have shown nothing but `404`
+
+looking at the file itself:
+
+```
+$ curl -o foo "http://aic-ngfts.lge.com/fts/path"
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  132k  100  132k    0     0   230k      0 --:--:-- --:--:-- --:--:--  230k
+$ file foo
+foo: Zip archive data, at least v2.0 to extract
+$ unzip foo
+Archive:  foo
+  inflating: schedule.json
+  inflating: program.json
+```
+
+##### `schedule.json`
+
+sample entry:
+
+```json
+{
+  "dbAction": "I",
+  "schdId": "100006/EP010865380045/2016-11-11-10:00",
+  "contentId": "EP010865380045",
+  "seqNo": "0",
+  "chanCode": "100006",
+  "strtTime": "2016,11,11,10,00,00",
+  "strtTimeLong": 1478858400,
+  "endTime": "2016,11,11,12,00,00",
+  "endTimeLong": 1478865600,
+  "schdSummary": "",
+  "timeType": "",
+  "schdPgmTtl": "Late Night Gifts",
+  "schdSubTtl": "Lisa Rinna",
+  "rebrdcstFlag": "Y",
+  "capFlag": "",
+  "liveFlag": "",
+  "dataBrdcstFlag": "",
+  "scExplnBrdcstFlag": "",
+  "scQualityGbn": "",
+  "signBrdcstFlag": "",
+  "voiceMultiBrdcstCount": "",
+  "threeDFlag": "",
+  "schdAdultClassCode": "-1",
+  "schdAgeGrdCode": "TVG",
+  "pgmGrId": "SH010865380000",
+  "genreCode": "61",
+  "realEpsdNo": "0"
+}
+```
+
+
+##### `program.json`
+
+```json
+{
+  "dbAction": "I",
+  "contentId": "EP000000510045",
+  "seqNo": "0",
+  "pgmGrId": "SH000000510000",
+  "connectorId": "1013932",
+  "serId": "184628",
+  "serNo": "",
+  "seasonId": "7895341",
+  "seasonNo": "3",
+  "pgmType": "Series",
+  "realEpsdNo": "1",
+  "summary": "Whitley encounters a new Dwayne on the plane ride back to school.",
+  "pgmImgUrlName": "http://ngfts.lge.com/fts/gftsDownload.lge?biz_code=IBS&func_code=TMS_PROGRAM_IMG&file_path=/ibs/tms/program_img/p184628_b_v7_ab.jpg",
+  "orgGenreType": "",
+  "orgGenreCode": "188",
+  "oGenreCode": "2",
+  "oGenreType": "",
+  "subGenreType": "",
+  "subGenreCode": "",
+  "makeCom": "",
+  "makeCntry": "",
+  "makeYear": "1989-09-28",
+  "usrPplrSt": "",
+  "pplrSt": "",
+  "audLang": "en",
+  "dataLang": "ENG",
+  "audQlty": "",
+  "genreImgUrl": "http://aic-ngfts.lge.com/fts/gftsDownload.lge?biz_code=IBS&func_code=GENRE_IMG&file_path=/ibs/genre_img_v/2_36_V_Sitcom.png",
+  "vodFlag": "N",
+  "pgmImgSize": "V480X720",
+  "genreImgSize": "V480X704",
+  "lgGenreCode2": "36",
+  "lgGenreName2": "Sitcom",
+  "programLock": "",
+  "castingFlag": "Y"
+}
+```
+
+<TODO description of attempts to hack>
 
 #### application marketplace
 
