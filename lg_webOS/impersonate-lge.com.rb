@@ -98,31 +98,44 @@ post '/CheckSWAutoUpdate.laf' do
   t = Time.now + (8 * 60 * 60)
   timestamp = t.strftime('%a, %d %b %Y %H:%m:%S GMT')
 
+  req_id = '00000000008613244660'
+
+  image_url  = 'http://snu.lge.com/fizbuzz'
+  image_size = '400'
+  image_name = 'fizzbuzz'
+
+  update_major_ver = '04'
+  update_minor_ver = '30.50'
+
+  force_flag = 'Y'
+  cdn_url    = 'http://snu.lge.com/fizzbuzz'
+  contents   = ''
+
   string = "<RESPONSE>
 <RESULT_CD>900</RESULT_CD>
 <MSG>Success</MSG>
-<REQ_ID>00000000008613244660</REQ_ID>
-<IMAGE_URL>http://snu.lge.com/fizbuzz</IMAGE_URL>
-<IMAGE_SIZE>400</IMAGE_SIZE>
-<IMAGE_NAME>fizzbuzz</IMAGE_NAME>
-<UPDATE_MAJOR_VER>04</UPDATE_MAJOR_VER>
-<UPDATE_MINOR_VER>30.50</UPDATE_MINOR_VER>
-<FORCE_FLAG>Y</FORCE_FLAG>
+<REQ_ID>#{req_id}</REQ_ID>
+<IMAGE_URL>#{image_url}</IMAGE_URL>
+<IMAGE_SIZE>#{image_size}</IMAGE_SIZE>
+<IMAGE_NAME>#{image_name}</IMAGE_NAME>
+<UPDATE_MAJOR_VER>#{update_major_ver}</UPDATE_MAJOR_VER>
+<UPDATE_MINOR_VER>#{update_minor_ver}</UPDATE_MINOR_VER>
+<FORCE_FLAG>#{force_flag}</FORCE_FLAG>
 <KE></KE>
 <GMT>#{timestamp}</GMT>
 <ECO_INFO>01</ECO_INFO>
-<CDN_URL>http://snu.lge.com/fizzbuzz</CDN_URL>
-<CONTENTS></CONTENTS>
+<CDN_URL>#{cdn_url}</CDN_URL>
+<CONTENTS>#{contents}</CONTENTS>
 </RESPONSE>"
 
   payload = Base64.strict_encode64(string)
 
   headers(
-      'Date'           => timestamp,
-      'Pragma'         => 'no-cache',
-      'Expires'        => '-1',
-      'Content-Type'   => 'application/octet-stream;charset=UTF-8',
-      'Content-Length' => payload.size,
+    'Date'           => timestamp,
+    'Pragma'         => 'no-cache',
+    'Expires'        => '-1',
+    'Content-Type'   => 'application/octet-stream;charset=UTF-8',
+    'Content-Length' => payload.size,
   )
 
   payload
