@@ -105,7 +105,7 @@ post '/CheckSWAutoUpdate.laf' do
   image_name = 'fizzbuzz'
 
   update_major_ver = '04'
-  update_minor_ver = '30.50'
+  update_minor_ver = '30.50' # right now, anything more than 30.40
 
   force_flag = 'Y'
   cdn_url    = 'http://snu.lge.com/fizzbuzz'
