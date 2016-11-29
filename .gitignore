@@ -14,6 +14,7 @@
 *.pcap*
 debian-binary
 *.ipk
+*.extracted
 
 # temp files
 *.swp
