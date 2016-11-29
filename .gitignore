@@ -16,5 +16,10 @@ debian-binary
 *.ipk
 *.extracted
 
+# lg binaries
+_ipk-*
+_downloaded
+
+
 # temp files
 *.swp
