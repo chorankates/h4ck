@@ -1,8 +1,7 @@
 #/usr/bin/env ruby
 ## impersonate-lge.com.rb - fake version of *.lge.com
 
-# serving a cooked version of busybox and base-files
-
+require 'base64'
 require 'sinatra'
 
 port   = ENV['USER'].eql?('root') ? 80 : 8080
@@ -15,37 +14,42 @@ set :public_folder, '_public'
 
 get '/fts/:file' do |file|
 
+  t = Time.now + (8 * 60 * 60)
+  timestamp = t.strftime('%a, %d %b %Y %H:%m:%S GMT')
+
   target_host = request.host
 
   if target_host.match(/gfts/)
-    @type = :ngfts
+    @type = :gfts
+    ## app store downloads
     # http://gfts.lge.com/fts/gftsFilePathDownload.lge?key=777863&hash=6Vsai7Ky71UPgetV&mtime=1479098823000
-    # this is the opkg update path
 
-    #redirect '/base-files/base-files.ipk'
 
-    # unfortunately, we need to set these headers:
-    # Server: Apache
-    # Content-Disposition: attachment; filename="16881482.ipk"
-    # Content-Transfer-Encoding: binary;
-    # Content-Type: application/octet-stream;charset=UTF-8
+    key   = params['key']   # 777863
+    hash  = params['hash']  # 6Vsai7Ky71UPgetV
+    mtime = params['mtime'] # 1479098823000
 
-    # and currently, we send:
-    # Content-Type: application/vnd.shana.informed.package
-    # and the other fields are empty
+    fake_ipk_name = '16881482.ipk'
+    real_ipk_file = File.join(settings.public_folder, '/gfts/base-files.ipk')
 
     headers(
-      'Content-Disposition'       => 'attachment; filename="base-files.ipk"',
+      'Content-Disposition'       => sprintf('attachment; filename="%s"', fake_ipk_name),
       'Content-Transfer-Encoding' => 'binary',
       'Content-Type'              => 'application/octet-stream;charset=UTF-8',
       'Server'                    => 'Apache',
     )
 
-    send_file File.join(settings.public_folder, '/base-files/base-files.ipk')
+    send_file real_ipk_file
 
   elsif target_host.match(/ngfts/)
+    ## channel searching -- images / thumbnails
+    # samples in line
     @type = :ngfts
-    biz_code = '' # TODO fill this in
+
+    biz_code  = params['biz_code']
+    func_code = params['func_code']
+    file_path = params['file_path']
+
     if biz_code.eql?('PREMIUMS')
       # TODO /fts/gftsDownload.lge?biz_code=PREMIUM&func_code=RECOMM_PROMOTION_IMAGE&file_path=/todayrecomm/template/promotion/w1_8.png
     elsif biz_code.eql?('META_IMG')
@@ -57,33 +61,73 @@ get '/fts/:file' do |file|
     elsif biz_code.eql?('MAS')
       # TODO /fts/gftsDownload.lge?biz_code=MAS&func_code=META_THUMBNAIL&file_path=%2Fmas%2Ftms%2Fprogram%2Fp185554_b_ap.jpg
     end
+
+    # failover
     redirect '/ngfts/faked-ngfts.zip'
+
   elsif target_host.match(/aic/)
+    ## channel searching - listing JSON
+    # http://aic-gfts.lge.com/fts/gftsDownload.lge?biz_code=IBS&func_code=ONLINE_EPG_FILE&file_path=/ibs/online/epg_file/20161116/f_1479280636996tmsepgcrawler_merged000004417_201611160600_06_20161116070000.zip
     @type = :aic
-    @real_file = '/aic/faked-aic.zip'
-    @fake_file = '16881482.ipk'
-    redirect real_file
+
+    fake_file = 'TODO' # TODO not sure what this is supposed to be
+    real_file = File.join(settings.public_folder, '/aic/faked-aic.zip')
+
+    if @type.eql?(:aic)
+      headers(
+          'Server'                    => 'Apache',
+          'Content-Disposition'       => sprintf('attachment; filename="%s"', fake_file),
+          'Content-Transfer-Encoding' => 'binary',
+          'Content-Type'              => 'image/jpeg;charset=UTF-8',
+          'Connection'                => 'keep-alive',
+          'Content-Length'            => File.read(real_file).size,
+          'Last-Modified'             => timestamp,
+          'Date'                      => timestamp,
+      )
+    end
+
+    send_file real_file
+
   else
     # failover
-    'your princess is in another castle'
+    'your princess is in another castle - lge'
   end
 end
 
-after do
-
+post '/CheckSWAutoUpdate.laf' do
   t = Time.now + (8 * 60 * 60)
   timestamp = t.strftime('%a, %d %b %Y %H:%m:%S GMT')
 
-  if @type.eql?(:aic)
-    response['Server'] = 'Apache'
-    response['Content-Disposition'] = sprintf('attachment; filename="%s"', @fake_file)
-    response['Content-Transfer-Encoding'] = 'binary'
-    response['Content-Type'] = 'image/jpeg;charset=UTF-8'
-    response['Connection'] = 'keep-alive'
-    response['Content-Length'] = File.read(@real_file).size
-    response['Last-Modified'] = timestamp
-    response['Date'] = timestamp
-  end
+  string = "<RESPONSE>
+<RESULT_CD>900</RESULT_CD>
+<MSG>Success</MSG>
+<REQ_ID>00000000008613244660</REQ_ID>
+<IMAGE_URL>http://snu.lge.com/fizbuzz</IMAGE_URL>
+<IMAGE_SIZE>400</IMAGE_SIZE>
+<IMAGE_NAME>fizzbuzz</IMAGE_NAME>
+<UPDATE_MAJOR_VER>04</UPDATE_MAJOR_VER>
+<UPDATE_MINOR_VER>30.50</UPDATE_MINOR_VER>
+<FORCE_FLAG>Y</FORCE_FLAG>
+<KE></KE>
+<GMT>#{timestamp}</GMT>
+<ECO_INFO>01</ECO_INFO>
+<CDN_URL>http://snu.lge.com/fizzbuzz</CDN_URL>
+<CONTENTS></CONTENTS>
+</RESPONSE>"
 
-  @type = @real_file = @fake_file = nil
+  payload = Base64.strict_encode64(string)
+
+  headers(
+      'Date'           => timestamp,
+      'Pragma'         => 'no-cache',
+      'Expires'        => '-1',
+      'Content-Type'   => 'application/octet-stream;charset=UTF-8',
+      'Content-Length' => payload.size,
+  )
+
+  payload
+end
+
+after do
+  # noop for now
 end

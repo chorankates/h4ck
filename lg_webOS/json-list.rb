@@ -20,8 +20,8 @@ start.downto(0).each do |i|
     puts sprintf('  [%s/%s] [%.2f%%]', i, start, (start.to_f / i.to_f) * 100)
   end
 
-  url      = sprintf('http://%s:%s/json/list?t=%s', h, p, i)
-  data     = nil
+  url  = sprintf('http://%s:%s/json/list?t=%s', h, p, i)
+  data = nil
 
   begin
     response = Utility.get_url(url)
