@@ -4,12 +4,12 @@
 - [digging](#digging)
   - [nmap](#nmap)
   - [sniffing](#sniffing)
-    - [on boot](#onboot)
-    - [channel search](#channelsearch)
-    - [application marketplace](#applicationmarketplace)
+    - [on boot](#on-boot)
+    - [channel search](#channel-search)
+    - [application marketplace](#application-marketplace)
 - [impersonating](#impersonating)
-  - [channel guide](#channelguide)
-  - [application update](#applicationupdate)
+  - [channel guide](#channel-guide)
+  - [application update](#application-update)
 
 ## TV
 name|value
@@ -22,7 +22,7 @@ vulnerabilities|all phone-home calls are done over `HTTP`
 
 the `43UH6100` is a 'smart' TV, running LG's [webOS](https://en.wikipedia.org/wiki/WebOS)
 since it is a fair assumption it is running [OpenWrt](https://en.wikipedia.org/wiki/OpenWrt) underneath, the original goal
-was rooting the device, but initial investigations showed some other interesting vectors.
+was rooting the device, but initial investigations showed some other interesting vectors
 
 ## digging
 
@@ -39,18 +39,18 @@ PORT     STATE SERVICE  VERSION
 ```
 
 aside from the obvious flag running of both HTTP and HTTPS versions of (likely) the same service,
-interested to see that the Chromecast plugged in to the TV is also being exposed on the same IP as the TV.
+interested to see that the Chromecast plugged in to the TV is also being exposed on the same IP as the TV
 
-since there is an [LG smart TV](TODO) app available for Android/iOS, assuming that there is an API of some sort running on `3000` or `3001`, so:
+since there is an [LG smart TV](http://www.lg.com/us/experience-tvs/smart-tv) app available for [Android](https://play.google.com/store/apps/details?id=com.lge.tv.remoteapps&hl=en)/[iOS](https://itunes.apple.com/us/app/lg-tv-remote/id509979485), assuming that there is an API of some sort running on `3000` or `3001`, so:
 
 ```
 $ curl http://<device>:3000
 Hello world
 ```
 
-we see the same response on `3001`, but have to use `-k` as the device uses a self-signed certificate.
+we see the same response on `3001`, but have to use `-k` as the device uses a self-signed certificate
 
-so, something is there, we just don't know how to talk to it yet.
+so, something is there, we just don't know how to talk to it yet
 
 ### sniffing
 
@@ -141,7 +141,7 @@ key                |assumption
 `CONTENTS`         | none
 
 
-half an hour of playing around with both the input and output here didn't yield any immediate results, but there is definite potential.
+half an hour of playing around with both the input and output here didn't yield any immediate results, but there is definite potential
 
 to speed this along, observe a session where the TV updated its firmware from the manufacturer 
 
