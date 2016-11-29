@@ -21,11 +21,17 @@ vulnerabilities|all phone-home calls are done over `HTTP`
 
 ### nmap
 
-from `nmap -PN -sV <device>`, we get:
+from `nmap -PN -p 1-65535 -sV <device>`, we get:
 
 ```
-<TODO all ports are closed>
+Nmap scan report for <device>
+Host is up (0.0016s latency).
+All 65535 scanned ports on <device> are closed
+
+Nmap done: 1 IP address (1 host up) scanned in 321.80 seconds
 ```
+
+so.. no open ports. let's try something different
 
 ### sniffing
 
