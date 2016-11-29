@@ -6,7 +6,7 @@ shiny devices are fun, finding and poking holes in their interface is a _lot_ of
 ## devices
 name | description | url
 -----|-------------|-----
-[CUJO](http://trycujo.com) | purposeful MiTM device for internet 'security'
+[CUJO](http://trycujo.com) | purposeful MiTM device for internet 'security' | [cujo](cujo)
 [LG webOS](http://www.lge.com) | HTTP phone home is never a good idea | [lg-webOS](lg_webOS)
 [HooToo TripMate series](http://www.hootoo.com) | there are lots of problems, some end up at root access | [hootoo](hootoo)
 [Philips Hue](http://www.meethue.com) | device communication insecure, Ruby library/CLI to control via REST HTTP | [hued](https://github.com/chorankates/hued)
