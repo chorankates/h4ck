@@ -1,0 +1,35 @@
+{
+  "updateType": "full",
+  "schCount": "1",
+  "scheduleList": [
+    {
+      "dbAction": "I",
+      "schdId": "100006/EP022959710001/2016-11-11-05:00",
+      "contentId": "EP022959710001",
+      "seqNo": "0",
+      "chanCode": "100006",
+      "strtTime": "2016,11,11,05,00,00",
+      "strtTimeLong": 1478840400,
+      "endTime": "2016,11,11,08,00,00",
+      "endTimeLong": 1478851200,
+      "schdSummary": "h4ck the planet",
+      "timeType": "",
+      "schdPgmTtl": "h4ck the planet",
+      "schdSubTtl": "h4ck the planet",
+      "rebrdcstFlag": "Y",
+      "capFlag": "",
+      "liveFlag": "",
+      "dataBrdcstFlag": "",
+      "scExplnBrdcstFlag": "",
+      "scQualityGbn": "",
+      "signBrdcstFlag": "",
+      "voiceMultiBrdcstCount": "",
+      "threeDFlag": "",
+      "schdAdultClassCode": "-1",
+      "schdAgeGrdCode": "TVG",
+      "pgmGrId": "SH022959710000",
+      "genreCode": "61",
+      "realEpsdNo": "0"
+    },
+  ]
+}

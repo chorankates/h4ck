@@ -24,7 +24,6 @@ get '/fts/:file' do |file|
     ## app store downloads
     # http://gfts.lge.com/fts/gftsFilePathDownload.lge?key=777863&hash=6Vsai7Ky71UPgetV&mtime=1479098823000
 
-
     key   = params['key']   # 777863
     hash  = params['hash']  # 6Vsai7Ky71UPgetV
     mtime = params['mtime'] # 1479098823000
