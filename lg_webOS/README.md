@@ -8,6 +8,7 @@
     - [channel search](#channel-search)
     - [application marketplace](#application-marketplace)
 - [impersonating](#impersonating)
+  - [OS update](#os-update)
   - [channel guide](#channel-guide)
   - [application update](#application-update)
 
@@ -21,6 +22,7 @@ features|app marketplace, live TV listings
 vulnerabilities|all phone-home calls are done over `HTTP`
 
 the `43UH6100` is a 'smart' TV, running LG's [webOS](https://en.wikipedia.org/wiki/WebOS)
+
 since it is a fair assumption it is running [OpenWrt](https://en.wikipedia.org/wiki/OpenWrt) underneath, the original goal
 was rooting the device, but initial investigations showed some other interesting vectors
 
@@ -141,10 +143,6 @@ key                |assumption
 `CONTENTS`         | none
 
 
-half an hour of playing around with both the input and output here didn't yield any immediate results, but there is definite potential
-
-to speed this along, observe a session where the TV updated its firmware from the manufacturer 
-
 #### channel search
 
 when configuring the cable connections, the TV makes a number of calls:
@@ -230,13 +228,6 @@ sample entry:
   "realEpsdNo": "0"
 }
 ```
-in `_public/aic/_source/slimmed/schedule.json`, changed:
-
-key           | value
---------------|----
-`schdSummary` | `h4ck the planet`
-`schdPgmTtl`  | `h4ck the planet`
-`schdSubTtl`  | `h4ck the planet`
 
 ##### `program.json`
 
@@ -280,6 +271,47 @@ key           | value
 }
 ```
 
+#### application marketplace
+
+bar
+
+# impersonating
+
+most (all?) of this data is based on `impersonate-lge.rb` interactions
+
+## OS update
+
+`impersonate-lge.rb` catches the POST to `/CheckSWAutoUpdate.laf`, changes:
+
+key                | value
+-------------------|-----------------------------
+`image_url`        | `http://snu.lge.com/fizbuzz`
+`image_size`       | `400`
+`image_name`       | `fizzbuzz`
+`update_major_ver` | `04`
+`update_minor_ver` | `30.50`
+`force_flag`       | `Y`
+`cdn_url`          | `http://snu.lge.com/fizzbuzz`
+`contents`         | `''`
+
+since the `update_minor_ver` specified is greater than the existing value (`30.40`), the TV prompts the user that an upgrade is available.
+
+the traffic after the user chooses to upgrade:
+
+```
+```
+
+
+## channel guide
+
+in `_public/aic/_source/slimmed/schedule.json`, changed:
+
+key           | value
+--------------|----
+`schdSummary` | `h4ck the planet`
+`schdPgmTtl`  | `h4ck the planet`
+`schdSubTtl`  | `h4ck the planet`
+
 in `_public/aic/_source/slimmed/program.json`, changed:
 
 key             | value
@@ -290,17 +322,8 @@ key             | value
 `pgmImgUrlName` | `http://aic-gfts.lge.com/aic/hacktheplanet.jpg`
 `summary`       | `h4ck the planet`
 
-#### application marketplace
+`contentId` and `pgmGrId` were changed to make them line up with changes made to `schedule.json`
 
-bar
-
-# impersonating
-
-baz
-
-## channel guide
-
-barney
 
 ## application update
 
