@@ -183,7 +183,7 @@ looking at the file path, if not in a chroot'd environment, potential for ~LFI -
 looking at the file itself:
 
 ```
-$ curl -o foo "http://aic-ngfts.lge.com/fts/path"
+$ curl -o foo "http://aic-ngfts.lge.com/fts/<path>"
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100  132k  100  132k    0     0   230k      0 --:--:-- --:--:-- --:--:--  230k
@@ -230,7 +230,13 @@ sample entry:
   "realEpsdNo": "0"
 }
 ```
+in `_public/aic/_source/slimmed/schedule.json`, changed:
 
+key           | value
+--------------|----
+`schdSummary` | `h4ck the planet`
+`schdPgmTtl`  | `h4ck the planet`
+`schdSubTtl`  | `h4ck the planet`
 
 ##### `program.json`
 
@@ -274,7 +280,15 @@ sample entry:
 }
 ```
 
-<TODO description of attempts to hack>
+in `_public/aic/_source/slimmed/program.json`, changed:
+
+key             | value
+----------------|----
+`contentId`     | `EP022959710001`
+`genreImgUrl`   | `http://aic-gfts.lge.com/aic/hacktheplanet.jpg`
+`pgmGrId`       | `SH022959710000`
+`pgmImgUrlName` | `http://aic-gfts.lge.com/aic/hacktheplanet.jpg`
+`summary`       | `h4ck the planet`
 
 #### application marketplace
 
