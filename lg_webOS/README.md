@@ -7,6 +7,7 @@
     - [on boot](#on-boot)
     - [channel search](#channel-search)
     - [application marketplace](#application-marketplace)
+    - [license manager](#license-manager)
 - [impersonating](#impersonating)
   - [OS update](#os-update)
   - [channel guide](#channel-guide)
@@ -271,9 +272,74 @@ sample entry:
 }
 ```
 
+`generate_slimmed-aic-json.rb` can be used to create a small schedule starting at the current time. 
+
 #### application marketplace
 
 bar
+
+#### license manager
+
+after an update of an application (and potentially other times), the device calls a different home:
+
+request:
+```
+POST /license_manager.asp HTTP/1.1
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1;)
+Host: us.security.lgtvsdp.com
+Content-Length: 210
+Content-Type:application/x-www-form-urlencoded
+X-Device-Product:webOSTV 3.0
+X-Device-Platform:W16P
+X-Device-Model:HE_DTV_W16P_AFADATAA
+X-Device-Netcast-Platform-Version:3.3.1
+X-Device-Eco-Info:1
+X-Device-Country-Group:US
+X-Device-Publish-Flag:Y
+X-Device-ContentsQA-Flag:Y
+X-Device-FW-Version:04.30.40
+X-Device-SDK-VERSION:3.3.1
+X-Device-ID:<redacted>
+X-Device-Type:T01
+X-Device-Language:en-US
+X-Device-Country:US
+X-Device-Remote-Flag:N
+X-Authentication:<redacted>
+
+
+mode=issuelicense4pre&sid=1827712162&deviceid=<redacted>>&devicemodel=webostv&p=D1609DEB7189B744D4BC272550CBF5BF&g=5&A=52013FFC91EA5A6F41BE025B5E4461FB&hmac=OnSGJj7D3yth5HPdafdtnArDKYc%3D
+```
+
+nothing in the request really jumps out
+
+response:
+```
+HTTP/1.1 200 OK
+Cache-Control: private
+Content-Length: 935
+Content-Type: text/html
+Server: Microsoft-IIS/7.5
+Set-Cookie: ASPSESSIONIDAARCQAST=DOLHEFIBIEAONHPFCIFPECDL; path=/
+X-Powered-By: ASP.NET
+Date: Tue, 15 Nov 2016 19:00:39 GMT
+
+<?xml version='1.0' encoding='utf-8'?><response result='0' message=''><responsedata>B=957172C7AF8EFA66326A7639D1C5301B;license=tDlsT2zdeFKZMZiOBv+pb9dSbyRclLkZJP4rw4Fv9tJYfqwbmE5kpDvHogWrC/yqMwlZG5tx+21PMV4zZDaYytZCZsfcJfLxHVFjU8MkfAOTtaPlUALmBvK/+jg4tGfE/LMoUGGle1huxAEM5UylS5zUA4yKa7V4XUgfFGde1ug9X3QzbnFH5oLMdmX7KyK3Z2HZ640kW/iGvPAz5lgZwvEx4I62aR7V0k/RbYMQfrC6jWHWVAz/yxNOOKSpMHK8tGNnGYoL9baiOh24jvoZ3lAvlLmPO/W8VmCZXRcmkTKuAvpej1fBFKzsRgfTci05MwqthA4caYxKGZhZdtWXJANzVE5V/2Xo35NG2lhwAEJmQoTP0ao6ygktdt+Eui6Ub4NIIn0WvpaNsQXkdhDnJ6ybpaXFy66KTevuJ7+/7N8E8RNF475EkF3FNuoVzNRTWxFmEk/IlMFVT0GgHh3q2sT8feNSo7usCYMLdnlDl15PDQ6894Weth6B+dbqe2xZk12qa7czTBlYAqjtH7oG2xg0G8N6vqrOHji8BkQ2zGnfqDmLq0OnFwlmUBu1GPyKpmsf+7pyuPEdVv8OI9TaEdqKw13IML6YVSJRHM7Q1hEpjwvbjttgk6XsJMvyVg7LMR3Fm1ZKOuRWbVrH/4j2fY5Nc6yek8y/aladiQnikoZ+CgSmvY58XsYu3Mo6J59X+z6jyUVka1/WhKAdVAHTUN2OZkH4rTYckgDMy3REXCU=;hmac=l0kBybteRX6bdSGjD/w0LV86MVU=</responsedata></response>
+```
+
+breaking down the XML response:
+
+```xml
+<?xml version='1.0' encoding='utf-8'?>
+<response result='0' message=''>
+  <responsedata>
+    B=957172C7AF8EFA66326A7639D1C5301B;
+    license=tDlsT2zdeFKZMZiOBv+pb9dSbyRclLkZJP4rw4Fv9tJYfqwbmE5kpDvHogWrC/yqMwlZG5tx+21PMV4zZDaYytZCZsfcJfLxHVFjU8MkfAOTtaPlUALmBvK/+jg4tGfE/LMoUGGle1huxAEM5UylS5zUA4yKa7V4XUgfFGde1ug9X3QzbnFH5oLMdmX7KyK3Z2HZ640kW/iGvPAz5lgZwvEx4I62aR7V0k/RbYMQfrC6jWHWVAz/yxNOOKSpMHK8tGNnGYoL9baiOh24jvoZ3lAvlLmPO/W8VmCZXRcmkTKuAvpej1fBFKzsRgfTci05MwqthA4caYxKGZhZdtWXJANzVE5V/2Xo35NG2lhwAEJmQoTP0ao6ygktdt+Eui6Ub4NIIn0WvpaNsQXkdhDnJ6ybpaXFy66KTevuJ7+/7N8E8RNF475EkF3FNuoVzNRTWxFmEk/IlMFVT0GgHh3q2sT8feNSo7usCYMLdnlDl15PDQ6894Weth6B+dbqe2xZk12qa7czTBlYAqjtH7oG2xg0G8N6vqrOHji8BkQ2zGnfqDmLq0OnFwlmUBu1GPyKpmsf+7pyuPEdVv8OI9TaEdqKw13IML6YVSJRHM7Q1hEpjwvbjttgk6XsJMvyVg7LMR3Fm1ZKOuRWbVrH/4j2fY5Nc6yek8y/aladiQnikoZ+CgSmvY58XsYu3Mo6J59X+z6jyUVka1/WhKAdVAHTUN2OZkH4rTYckgDMy3REXCU=;
+    hmac=l0kBybteRX6bdSGjD/w0LV86MVU=
+  </responsedata>
+</response>
+```
+
+both `license` and `hmac` values are obviously hashes, but have been unable to determine what kind
 
 # impersonating
 
@@ -301,6 +367,7 @@ the traffic after the user chooses to upgrade:
 ```
 ```
 
+<TODO finish this writeup and hack>
 
 ## channel guide
 
@@ -323,6 +390,8 @@ key             | value
 `summary`       | `h4ck the planet`
 
 `contentId` and `pgmGrId` were changed to make them line up with changes made to `schedule.json`
+
+<TODO show interactions.. finish the writeup and the hack>
 
 
 ## application update
