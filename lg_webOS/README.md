@@ -362,12 +362,120 @@ key                | value
 
 since the `update_minor_ver` specified is greater than the existing value (`30.40`), the TV prompts the user that an upgrade is available.
 
-the traffic after the user chooses to upgrade:
+the traffic after the user chooses to upgrade starts with a `GET` of the `image_url`:
 
 ```
+GET /fizzbuzz HTTP/1.1
+Accept: */*
+Host: snu.lge.com
+Range: bytes=0-1715
+Connection: Closed
 ```
 
-<TODO finish this writeup and hack>
+followed by 5 retries, since they all received 404 as we're not sure what the format of the update actually is (yet), but assume it will be an `.ipk` as well.
+
+then some base64 encoded data with a log :
+
+```
+POST /SWDownloadStartLog.laf HTTP/1.1
+Accept: */*
+User-Agent: User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)
+Host: snu.lge.com:80
+Connection: Keep-Alive
+Content-type: application/x-www-form-urlencoded
+Content-Length: 268
+
+PFJFUVVFU1Q+CjxSRVFfSUQ+MDAwMDAwMDAwMDg2MTMyNDQ2NjA8L1JFUV9JRD4KPFBST0RVQ1RfTk0+d2ViT1NUViAzLjA8L1BST0RVQ1RfTk0+CjxNT0RFTF9OTT5IRV9EVFZfVzE2UF9BRkFEQVRBQTwvTU9ERUxfTk0+CjxTV19UWVBFPkZJUk1XQVJFPC9TV19UWVBFPgo8SU1BR0VfTkFNRT5maXp6YnV6ejwvSU1BR0VfTkFNRT4KPC9SRVFVRVNUPgo=
+```
+
+decoded:
+
+```xml
+<REQUEST>
+  <REQ_ID>00000000008613244660</REQ_ID>
+  <PRODUCT_NM>webOSTV 3.0</PRODUCT_NM>
+  <MODEL_NM>HE_DTV_W16P_AFADATAA</MODEL_NM>
+  <SW_TYPE>FIRMWARE</SW_TYPE>
+  <IMAGE_NAME>fizzbuzz</IMAGE_NAME>
+</REQUEST>
+```
+
+and then some similar data to a different endpoint:
+
+```
+POST /DownloadResult.laf HTTP/1.1
+Accept: */*
+User-Agent: User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)
+Host: snu.lge.com:80
+Connection: Keep-Alive
+Content-type: application/x-www-form-urlencoded
+Content-Length: 308
+
+PFJFUVVFU1Q+CjxSRVFfSUQ+MDAwMDAwMDAwMDg2MTMyNDQ2NjA8L1JFUV9JRD4KPFBST0RVQ1RfTk0+d2ViT1NUViAzLjA8L1BST0RVQ1RfTk0+CjxNT0RFTF9OTT5IRV9EVFZfVzE2UF9BRkFEQVRBQTwvTU9ERUxfTk0+CjxTV19UWVBFPkZJUk1XQVJFPC9TV19UWVBFPgo8VVBEQVRFX1JFU1VMVD43MjI8L1VQREFURV9SRVNVTFQ+CjxSRVRSWV9DT1VOVD4wPC9SRVRSWV9DT1VOVD4KPC9SRVFVRVNUPgo=
+```
+
+decoded:
+
+```xml
+<REQUEST>
+  <REQ_ID>00000000008613244660</REQ_ID>
+  <PRODUCT_NM>webOSTV 3.0</PRODUCT_NM>
+  <MODEL_NM>HE_DTV_W16P_AFADATAA</MODEL_NM>
+  <SW_TYPE>FIRMWARE</SW_TYPE>
+  <UPDATE_RESULT>722</UPDATE_RESULT>
+  <RETRY_COUNT>0</RETRY_COUNT>
+</REQUEST>
+```
+
+so, now we know what the process is, just need to determine what the format/contents of the OS update is. 
+
+after shutting down `impersonate-lge.com.rb`, the real `snu.lge.com` responds to `/CheckSWAutoUpdate.laf` with:
+
+```
+GET /GlobalSWDownloadCdn.laf?IMG=/<redacted>-prodkey_nsu_V3_SECURED.epk HTTP/1.1
+Accept: */*
+Host: su.lge.com:80
+Range: bytes=0-1715
+Connection: Closed
+```
+
+taking a look at the (850mb) file:
+
+```
+$ binwalk -v --dd='.*' <redacted>-prodkey_nsu_V3_SECURED.epk
+
+Scan Time:     2016-12-28 22:41:37
+Target File:   <redacted>-prodkey_nsu_V3_SECURED.epk
+MD5 Checksum:  eadf4625c8033f286f7459766558d43b
+Signatures:    344
+
+DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+1437257       0x15EE49        HPACK archive data
+88501492      0x5466CF4       StuffIt Deluxe Segment (data): f
+116751487     0x6F57C7F       VMware4 disk image
+151796947     0x90C3CD3       LANCOM OEM file
+184522619     0xAFF977B       MySQL ISAM compressed data file Version 4
+188949815     0xB432537       QEMU QCOW Image
+202964337     0xC18FD71       MySQL ISAM compressed data file Version 8
+360991579     0x15844B5B      MySQL ISAM compressed data file Version 9
+403720767     0x18104A3F      MySQL ISAM compressed data file Version 5
+438498638     0x1A22F54E      Cisco IOS experimental microcode, for ""
+558916980     0x21506574      QEMU QCOW Image
+652690023     0x26E74267      COBALT boot rom data (Flat boot rom or file system)
+673373671     0x2822DDE7      StuffIt Deluxe Segment (data): f
+752461107     0x2CD9A533      MySQL ISAM index file Version 11
+798709823     0x2F9B583F      LANCOM OEM file
+828143551     0x315C77BF      MySQL ISAM index file Version 11
+828353910     0x315FAD76      MySQL ISAM compressed data file Version 4
+```
+
+however, given the 'encrypted' portion of the filename and the fact that none of the files are actually usable as the type indicated here 
+- the encryption is throwing off `binwalk` file type detection 
+
+attempting to find an unencrypted version of the file by fuzzing the original URL has, so far, proved unsuccessful.
+
+# TODO how would we determine the type of encryption in order to start attacking it?
 
 ## channel guide
 

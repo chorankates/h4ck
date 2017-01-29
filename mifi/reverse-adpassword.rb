@@ -35,7 +35,5 @@ end
 # TODO first we mimic the encoding, then we can decode
 encoded = rstr2hex(rstr_sha1(str2rstr_utf8(password)))
 
-puts sprintf('%s %s', decoded, "\n")
-
-
-
+puts sprintf('%s', encoded)
+puts sprintf('%s', decoded)

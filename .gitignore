@@ -19,6 +19,7 @@ debian-binary
 # lg binaries
 _ipk-*
 _downloaded
+*extracted*
 
 
 # temp files

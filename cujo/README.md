@@ -8,14 +8,13 @@
   - [phone home](#phone-home)
 
 ## TV
-name|value
-----|-----
-model|TODO
-product|`TODO`
-firmware|`TODO`
-features|TODO 
-vulnerabilities|all phone-home calls are done over `HTTP`
-
+name            | value
+----------------|-----
+model           | `TODO`
+product         | `TODO`
+firmware        | `TODO`
+features        | TODO 
+vulnerabilities | all phone-home calls are done over `HTTP`
 
 ## digging
 
@@ -37,8 +36,8 @@ so.. no open ports. let's try something different
 
 watching the network activity of the device (`192.168.1.108`), noticed it tried to resolve:
 
-  * agent.cujo.io
-  * jenkins.getcujo.com
+  * `agent.cujo.io`
+  * `jenkins.getcujo.com`
   
 but since the network isn't allowing external traffic, the DNS resolution fails. 
 

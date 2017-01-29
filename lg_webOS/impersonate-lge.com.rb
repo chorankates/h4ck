@@ -28,8 +28,14 @@ get '/fts/:file' do |file|
     hash  = params['hash']  # 6Vsai7Ky71UPgetV
     mtime = params['mtime'] # 1479098823000
 
-    fake_ipk_name = '16881482.ipk'
+    fake_ipk_name = sprintf('%s.ipk', key)
     real_ipk_file = File.join(settings.public_folder, '/gfts/base-files.ipk')
+
+    if mtime
+      mtime_int  = Time.at(mtime.to_i / 1000).to_i
+      mtime_args = Time.at(mtime_int).strftime('%Y%m%d%H%M')
+      `touch -t #{mtime_args} #{real_ipk_file}`
+    end
 
     headers(
       'Content-Disposition'       => sprintf('attachment; filename="%s"', fake_ipk_name),
@@ -38,7 +44,7 @@ get '/fts/:file' do |file|
       'Server'                    => 'Apache',
     )
 
-    send_file real_ipk_file
+    send_file(real_ipk_file)
 
   elsif target_host.match(/ngfts/)
     ## channel searching -- images / thumbnails
