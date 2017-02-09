@@ -34,7 +34,7 @@ class BfLogin
   end
 
   def add_pin_to_db(ip, pin)
-    if @dbh[:pins].where(:ip => ip).count.eql?(0)
+    unless self.pin_known?(ip)
       @dbh[:pins].insert(
         :ip      => ip,
         :pin     => pin,
@@ -44,6 +44,14 @@ class BfLogin
       puts sprintf('found pin[%s] for ip[%s], but database already includes this', pin, ip)
     end
     @found[ip] = pin
+  end
+
+  def pin_known?(ip)
+    @dbh[:pins].where(:ip => ip).count > 0
+  end
+
+  def get_pin(ip)
+    @dbh[:pins].select(:pin).where(:ip => ip).all.first[:pin]
   end
 
   # return a Net::HTTP::Post request suitable for validating +pin+
@@ -76,8 +84,14 @@ class BfLogin
 
   # return True|False
   def check_pin(url, pin)
+    uri = URI.parse(url)
 
-    uri  = URI.parse(url)
+    if self.pin_known?(uri.host)
+      kp = self.get_pin(uri.host)
+      raise BfLoginError.new(sprintf('host[%s] pin is already known[%s]', uri.host, kp))
+    end
+
+
     http = Net::HTTP.new(uri.host, uri.port)
 
     http.open_timeout = 5
@@ -109,7 +123,7 @@ if address.nil?
   exit 1
 end
 
-mode = address.match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/) ? :ip : :range
+mode    = address.match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/) ? :ip : :range
 targets = Array.new
 
 if mode.eql?(:ip)
