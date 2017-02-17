@@ -99,8 +99,8 @@ class BfLogin
     request  = get_request(uri, pin)
     response = http.request(request)
 
-    # <properties sys.validate-password="0"></properties>
-    #if response['Content-Type'].eql?('text/html') # crappy cisco devices
+    # wrong: <properties sys.validate-password="0"></properties>
+    # right: <properties sys.validate-password="1"></properties>
     if response['Content-Type'].eql?('text/plain')
       response.body.match(/1/) ? true : false
     else
