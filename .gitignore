@@ -15,6 +15,7 @@
 debian-binary
 *.ipk
 *.extracted
+*.csv
 
 # lg binaries
 _ipk-*
