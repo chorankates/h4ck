@@ -7,7 +7,7 @@
 - [impersonating](#impersonating)
   - [phone home](#phone-home)
 
-## TV
+## device
 name            | value
 ----------------|-----
 model           | `TODO`
