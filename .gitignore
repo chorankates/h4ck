@@ -4,7 +4,8 @@
 *.zip
 *.sth
 *crx*
-
+*.bundle*
+*squashfs*
 
 # project files
 *.iml
@@ -17,10 +18,12 @@ debian-binary
 *.extracted
 *.csv
 
-# lg binaries
+# our binaries
 _ipk-*
 _downloaded
-*extracted*
+**/*extracted*
+**/squashfs-root/*
+*.cpio
 
 
 # temp files
