@@ -448,7 +448,7 @@ lametric/system/apps/com.lametric.radio/res/stop.png
 $ find usr/share/sounds/lametric -iname '*.wav' | wc -l
       54
 
-$ cat <>
+$ cat lametric/system/gui/com.lametric.broken_app/settings.json
 ...
 {
   "version":1,
