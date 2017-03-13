@@ -6,6 +6,7 @@
 *crx*
 *.bundle*
 *squashfs*
+*.bin
 
 # project files
 *.iml
