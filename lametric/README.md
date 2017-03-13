@@ -214,7 +214,47 @@ authing with `dev` and `\<api key\>`, was got the expected list of routes:
 
 cool, so we can talk to the API successfully now - unfortunately, there isn't much that appears interesting on the surface, at least from an attack vector.
 
-TODO add some redacted samples
+`curl --user dev:<api_key> https://<device>/api/v2/device`
+```json
+{
+  "audio": {
+    "volume": 46
+  },
+  "bluetooth": {
+    "active": false,
+    "address": "<redacted>",
+    "available": true,
+    "discoverable": false,
+    "name": "LM7817",
+    "pairable": true
+  },
+  "display": {
+    "brightness": 100,
+    "brightness_mode": "auto",
+    "height": 8,
+    "type": "mixed",
+    "width": 37
+  },
+  "id": "10478",
+  "mode": "manual",
+  "model": "LM 37X8",
+  "name": "LM7817",
+  "os_version": "1.7.1",
+  "serial_number": "<redacted>",
+  "wifi": {
+    "active": true,
+    "address": "<redacted>",
+    "available": true,
+    "encryption": "open",
+    "essid": "home",
+    "ip": "172.16.42.219",
+    "mode": "dhcp",
+    "netmask": "255.255.255.0",
+    "strength": 100
+  }
+}
+
+```
 
 ### firmware
 
@@ -260,10 +300,10 @@ now we're getting somewhere.
 
 ```
 $ head -n 1 etc/shadow
-root:$1$bxtvUSvB$y/SmJDjdq8IL.Q.Gkoobm.:10933:0:99999:7:::
+root:<redacted>:10933:0:99999:7:::
 ```
 
-started cracking at 5:30 on Friday afternoon <TODO> finish writeup after cracking
+started cracking at 5:30 on 2017/03/10, and as of 2017/03/12, the GCP instance has been unable to crack the password hash. soon.gif
 
 ```
 $ cat lametric/system/services/com.lametric.api/.api
