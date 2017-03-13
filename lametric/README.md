@@ -500,11 +500,6 @@ lots of interesting bits:
 
 unfortunately, many of the files mentioned live in `/lametric/data/configs` which is mostly unpopulated in the firmware squashfs, so will need to revisit once the root hash is cracked.
 
-find all keys and try to use them to ssh in?
-/Users/conor/git/h4ck/lametric/squashfs-root/squashfs-root/etc/wireless-regdb/pubkeys/linville.key.pub.pem
-/Users/conor/git/h4ck/lametric/squashfs-root/squashfs-root/etc/ssl/private/192.168.0.180.key
-
-
 ### UPNP
 
 ```xml
