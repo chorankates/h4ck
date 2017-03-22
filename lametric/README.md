@@ -23,7 +23,7 @@ the `TIME LM 37X8` is a 'smart' clock that features:
   * internet connectivity to download apps, exchange information
   * bluetooth controller to use the internal speaker
   * clock with multiple alarms
-  * web radio tuner
+  * FM radio
   * timer
   * stopwatch
 
@@ -160,6 +160,17 @@ content-length: 791
 
 this port seems to change, but is easy to find as is part of an SSDP [UPNP broadcast](#upnp)
 
+
+```
+GET /SamFMBristol-128?token=<redacted> HTTP/1.1
+User-Agent: Music Player Daemon 0.19.3
+Host: stream5.radiomonitor.com
+Accept: */*
+Icy-Metadata: 1
+```
+
+token for an assumed premium account is sent in the clear when the radio app is started
+
 ### mobile app
 
 by changing the weather settings, we see:
@@ -193,7 +204,7 @@ looks like a premium API key to [world weather online](worldweatheronline.com)
 
 looking at some [docs](http://lametric-documentation.readthedocs.io/en/latest/reference-docs/lametric-time-reference.html) from lametric, was able to determine that the api lives at `http://device:port/api/v2`
 
-authing with `dev` and `\<api key\>`, was got the expected list of routes:
+authing with `dev` and `<api key>`, was got the expected list of routes:
 
 ```json
 {
@@ -496,7 +507,7 @@ lots of interesting bits:
   * it has a keyboard controller, does not appear specific to the 3 buttons
   * like most devices, has an easily accessible glob/regex of 'allowed' firmware names
   * why is there an alarm set for `15:22:49`?
-  * what is the test that happens when we run `lmledtool -t`
+  * what is the test that happens when we run `lmledtool -t`?
 
 unfortunately, many of the files mentioned live in `/lametric/data/configs` which is mostly unpopulated in the firmware squashfs, so will need to revisit once the root hash is cracked.
 
