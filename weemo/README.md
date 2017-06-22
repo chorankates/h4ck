@@ -1,4 +1,4 @@
-# Mini
+# Belkin Weemo Mini
 
 - [device](#device)
 - [digging](#digging)
@@ -8,7 +8,7 @@
 ## device
 name            | value
 ----------------|-----
-model           | `TODO`
+model           | `Mini`
 product         | `TODO`
 firmware        | `TODO`
 features        | WiFi enabled power strip
