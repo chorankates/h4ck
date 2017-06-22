@@ -14,3 +14,4 @@ name | description | url
 [RAV FileHub](http://www.ravpower.com/ravpower-rp-wd02-filehub-6000mah-power-bank.html) | a HooToo by any other name.. but with a twist | [rav-filehub](rav-filehub)
 [RevoLabs flx UC1000](http://www.revolabs.com/products/conference-phones/wired-conference-phones/flx-uc-phones/flx-uc-1000-speakerphone) | more than just brute forcing the PIN | [revolabs-flx_uc_1000](revolabs-flx_uc_1000)
 [Ubiquiti mFi mPower](https://www.ubnt.com/mfi/mpower/) | root access trivially obtained, credential leakage, unnecessary services exposed | [ubiquiti/mFi](ubiquiti/mfi)
+[Weemo Mini]() | work in progress, recon mostly done | [weemo](weemo)
