@@ -208,13 +208,13 @@ shows us that they are booting with ```mem=128M console=ttyS0,115200n8 root=/dev
     }])
 ```
 
-looking at this, it would appear that http://<device>/app/diag/diag.html exposes a mechanism to execute arbitrary commands. `/usr/sbin/telnetd` anyone?
+looking at this, it would appear that http://\<device\>/app/diag/diag.html exposes a mechanism to execute arbitrary commands. `/usr/sbin/telnetd` anyone?
 
 ### log mining and traffic sniffing
 
 using <dump logs?> functionality, and the high logging levels they provided, was able to determine a number of things:
 
   * it utilizes the [pjsua](http://www.pjsip.org/pjsua.htm) library/client
-  * it sends a TFTP BOOT request for tftp://<primary SIP registrar>/<static hex string>.xml every 30 seconds
+  * it sends a TFTP BOOT request for tftp://\<primary SIP registrar\>/<static hex string>.xml every 30 seconds
 
 next step will be combining the information about the `telnet_enabled` kernel parameter, and crafting a TFTP configuration that will do just that.
