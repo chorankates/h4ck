@@ -130,6 +130,86 @@ looking at the `S45Revo` file, a potential avenue to `uid=0`:
 
 more to come.
 
+```
+$ tree /squash/
+...
+│   └── modules
+│       └── 2.6.37+
+│           ├── build -> /home/hudson/jobs/Ruby1000-Tools/workspace/Ruby/dvsdk/psp/linux-2.6.37-psp03.21.00.04.sdk
+│           ├── kernel
+│           │   └── drivers
+│           │       ├── dsp
+│           │       │   └── dsplinkk.ko
+│           │       └── usb
+│           │           ├── core
+│           │           │   └── usbcore.ko
+│           │           ├── musb
+│           │           │   ├── da8xx.ko
+│           │           │   └── musb_hdrc.ko
+│           │           ├── otg
+│           │           │   └── nop-usb-xceiv.ko
+│           │           └── serial
+│           │               └── usbserial.ko
+...
+```
+
+well at least they're using CI..
+
+
+```
+│   ├── USB_Digital_Audio1500_bb.cyacd
+│   ├── USB_Digital_Audio1500.cyacd
+│   ├── USB_Digital_Audio_bb.cyacd
+│   ├── USB_Digital_Audio.cyacd
+```
+
+according to [a quick google search](http://www.cypress.com/knowledge-base-article/format-cyacd-file-psoc-3-or-psoc-5lp-bootloader-kba216138), these are 'Code Data Files' for the PSoC 3 or PSoC 5 Bootloader
+
+with a format of:
+```
+[1-byte ArrayID][2-byte RowNumber][2-byte DataLength][N-byte Data][1byte Checksum]
+```
+
+```
+# head /squashy/sbin/USB_Digital_Audio1500_bb.cyacd
+1E07D0690301
+:0000280120022EE9008F828E83E0540100000070F82278FFE4F6D8FD022F18BB010689828A83E0225002E722BBFE02E32289828A83E49322BB010689828A83F0225002F722BBFE01F322C5F0F8A3E028F0C5F0F8E582158270021583E038F022A3F8E0C5F025F0F0E582158270021583E0C838F0E822BB010A89828A83E0F5F0A3E022500687F009E71922BBFE07E3F5F009E3192289828A83E493F5F074019322BB010A89828A83F0E5F0A3F0225006F70
+9A7F01922BBFE06F3E5F009F31922EF2BFFEE3AFEED39FDEC38FC22C3EF9BFFEE9AFEED99FDEC98FC22E88FF0A4CC8BF0A42CFCE98EF0A42CFC8AF0EDA42CFCEA8EF0A4CDA8F08BF0A42DCC3825F0FDE98FF0A4250045017E0
+20052040404104011C07C4000640527048203837F84078A7F0100A3
+:00002901202CCD35F0FCEB8EF0A4FEA9F0EB8FF0A4CFC5F02ECD39FEE43CFCEAA42DCE35F0FDE43CFC2275F008758200EF2FFFEE33FECD33CDCC33CCC58233C5829BED9AEC99E58298400CF582EE9BFEED9AFDEC99FC0FD5F0D6E4CEFBE4CDFAE4CCF9A88222B800C1B90059BA002DEC8BF084CFCECDFCE5F0CBF97818EF2FFFEE33FEED33FDEC33FCEB33FB10D703994004EB99FB0FD8E5E4F9FA227818EF2FFFEE33FEED33FDEC33FCC933C910D7059BE
+99A4007EC9BFCE99AF90FD8E0E4C9FAE4CCFB2275F010EF2FFFEE33FEED33FDCC33CCC833C810D7079BEC9AE899400AED9BFDEC9AFCE899F80FD5F0DAE4CDFBE4CCFAE4C8F922EF5BFFEE5AFEED59FDEC58FC225A0304040F0
+81109020A220B0D0C070E081480150616701709188019011A701C0B
+```
+
+
+```
+...
+    │   └── udev
+    │       ├── saved.cmdline
+...
+```
+
+shows us that they are booting with ```mem=128M console=ttyS0,115200n8 root=/dev/ram0 rw initrd=0xc1180000,4m ip=off```, which should help with the TFTP booting attack
+
+```js
+.call(this), function () {
+    "use strict";
+    angular.module("r1kApp").config(["$stateProvider", function (a) {
+        return a.state("main.diag", {url: "diag", templateUrl: "app/diag/diag.html", controller: "DiagCtrl"})
+    }]), angular.module("r1kApp").controller("DiagCtrl", ["$scope", "Device", "$rootScope", function (a, b) {
+        return a.forms = diag.forms, a.diag = [], a.submitForm = function (c) {
+            var d;
+            return d = {}, d[c] = a.diag[c] || "", b.request("RequestStatus", d).then(function () {
+                return a.buildToast("Command has been sent.")
+            }, function () {
+                return a.buildToast("Uh oh! Couldn't send command. Is the device available?")
+            })
+        }
+    }])
+```
+
+looking at this, it would appear that http://<device>/app/diag/diag.html exposes a mechanism to execute arbitrary commands. `/usr/sbin/telnetd` anyone?
+
 ### log mining and traffic sniffing
 
 using <dump logs?> functionality, and the high logging levels they provided, was able to determine a number of things:
