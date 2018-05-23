@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp codebase="" href="" spec="1.0+">
+  <information>
+    <title>WiFi Device API</title>
+    <vendor>Tri Cascade Inc.</vendor>
+  </information>
+  <resources>
+    <j2se href="http://java.sun.com/products/autodl/j2se" version="1.7.0_51+" />
+    <jar href="WiFiDeviceAPI.jar" main="true" version="1.4.2" />
+    <property name="jnlp.versionEnabled" value="true" />
+  </resources>
+  <applet-desc height="1" main-class="com.insnergy.wifi.applet.WiFiDeviceAPI" name="WiFi Device API" width="1" />
+  <update check="always" policy="always" />
+  <security>
+    <all-permissions />
+  </security>
+</jnlp>
