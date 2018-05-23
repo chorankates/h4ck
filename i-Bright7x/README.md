@@ -139,7 +139,7 @@ $ echo 97451790c91d3c78bee70be7bac5f9b0 | cut -c1-10
 97451790c9
 ```
 
-the first 10 characters of the MD5 sum of the MAC address is the SSID password.
+the first 10 characters of the MD5 sum of the MAC address is the SSID password - and the SSID contains the MAC address.
 
 unfortunately, this password does not work when attempting to log in to the web application running on :80
 
