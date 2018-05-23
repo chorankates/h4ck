@@ -1,0 +1,8 @@
+DEFAULT uid0
+PROMPT 0
+
+LABEL uid0
+   MENU LABEL ^passing parameters to the kernel
+   MENU DEFAULT
+   #KERNEL TRK/kernel.trk
+   APPEND mem=128M console=ttyS0,115200n8 root=/dev/ram0 rw initrd=0xc1180000,4m ip=off telnet_enabled=1
