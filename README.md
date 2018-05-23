@@ -9,7 +9,7 @@ name | description | url
 [CUJO](http://trycujo.com) | purposeful MiTM device for internet 'security' | [cujo](cujo)
 [LG webOS](http://www.lge.com) | HTTP phone home is never a good idea | [lg-webOS](lg_webOS)
 [HooToo TripMate series](http://www.hootoo.com) | there are lots of problems, some end up at root access | [hootoo](hootoo)
-[TriCascade i-Bright7x](http://www.tricascade.com/i-bright7x-smart-surge-protector/) | work in progress, some recon done | [i-Bright7x](i-Bright7x)
+[TriCascade i-Bright7x](http://www.tricascade.com/i-bright7x-smart-surge-protector/) | work in progress, SSID password from MAC address, telnet but no access | [i-Bright7x](i-Bright7x)
 [Lametric Time](http://lametric.com) | WiFi/internet enabled clock/LED display, unnecessary services exposed, root access obtainable | [lametric](lametric)
 [Philips Hue](http://www.meethue.com) | device communication insecure, Ruby library/CLI to control via REST HTTP | [hued](https://github.com/chorankates/hued)
 [RAV FileHub](http://www.ravpower.com/ravpower-rp-wd02-filehub-6000mah-power-bank.html) | a HooToo by any other name.. but with a twist | [rav-filehub](rav-filehub)

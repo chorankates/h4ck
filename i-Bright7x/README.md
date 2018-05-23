@@ -4,6 +4,10 @@
 - [digging](#digging)
   - [nmap](#nmap)
   - [jnlp](#jnlp)
+  - [live ports](#live_ports)
+    - [23](#23)
+    - [80](#80)
+    - [8080](#8080)
 
 ## device
 name     | value
@@ -90,41 +94,168 @@ unzipping gives a bit of a clue about the structure - but nothing really interes
 
 it looks like the password is derived from the MAC address of the device - which is worse than it sounds, because the WiFi network it exposes for configuration is `'B7' + $MAC_ADDRESS`
 
+walking the Java code backwards:
+  * `DeviceAP.extractMac(string)` returns characters 8-20 of whatever it is passed
+  * `a`, is called with the result of above, which initially was misunderstood since the decompilation was ambiguous
+  * `substring(0, 10).toLowerCase()` is called on whatever `a` returns
+
+within the context of what concrete values our device uses:
+
+key      | value
+---------|-------
+MAC      | `8C:C7:AA:02:97:48`
+SSID     | `B78CC7AA029748` // so.. 'B7' + $MAC - ':'
+ID       | `TC0600008CC7AA029748` // so 'TC060000' + $MAC
+password | `97451790c9`
+
+8-20 characters fits as the actual MAC address inside the ID value, but that gives us '8cc7aa0297', not '97451790c9'
+
+however, using the second-level deobfuscation feature of jadx turns `a` into `m56a`:
 ```java
-// from com/insnergy/wifi/applet/e.java
+// com/insnergy/wifi/p002b/C0020a.java
 
-    public final void run() {
-        try {
-            if (b.a((CharSequence)this.a.a) || !RegexPattern.DEVICE_ID.isValid(this.a.a)) {
-                throw new ApiException("Not a valid device ID : " + this.a.a);
-            }
-            DeviceAP deviceAP = DeviceAP.of(this.a.a);
-            WiFiDeviceAPI.a(this.a.b, deviceAP.getSsid(this.a.a), deviceAP.getPassword(this.a.a));
-            Thread.sleep(1000);
-            WiFiDeviceAPI.b(this.a.b, WiFiDeviceAPI.d(this.a.b).trigger(), "");
-            return;
+public static String m56a(String str) {
+    try {
+        if (C0021b.m61a((CharSequence) str)) {
+            return "";
         }
-...
-```
-
-in a roundabout way, we're right: the MAC address is being pulled out of the device ID, which is `'TC060000' + $MAC_ADDRESS`, hence the `substring`
-
-additionally, it looks like the signature for `a` is `($IP, $SSID, $PASSWORD)`
-
-```java
-// from com/insnergy/wifi/device/api/c.java
-
-    public final Connect a(String object, String string, String string2, String string3) {
-        String string4 = "Connect?ssid={0}&secmode={1}&encrypt={2}";
-        MessageFormat messageFormat = new MessageFormat(string4);
-        if (b.b((CharSequence)string3)) {
-            messageFormat = new MessageFormat(string4 + "&conpass={3}");
-        }
-        object = this.a(messageFormat, new String[]{object, string, string2, string3});
-        return (Connect)this.a((JSONObject)object, new Connect());
+        MessageDigest instance = MessageDigest.getInstance("MD5");
+        instance.update(str.getBytes());
+        return new HexBinaryAdapter().marshal(instance.digest());
+    } catch (NoSuchAlgorithmException e) {
+        e.toString();
+        return "";
     }
+}
+
 ```
 
+giving us the final step we need:
+
+```
+$ echo -n 8CC7AA029748 | md5sum
+97451790c91d3c78bee70be7bac5f9b0
+$ echo 97451790c91d3c78bee70be7bac5f9b0 | cut -c1-10
+97451790c9
+```
+
+the first 10 characters of the MD5 sum of the MAC address is the SSID password.
+
+unfortunately, this password does not work when attempting to log in to the web application running on :80
+
+## live ports
+
+### 23
+
+```
+$ nc 192.168.17.1 23
+
+BRIGHT7 login: admin
+admin
+Password: admin
+
+Login incorrect
+```
+
+there is a 1-2 second delay before declaring the login incorrect, making bruteforce even less desirable than usual.
+
+### 80
+
+attempts to login leak validity of username and password independently.
+
+when trying with `admin`, get redirected to `/index.htm?wrongpass1`:
+
+```
+$ curl http://192.168.17.1/cgi-bin/login.apply -v -d 'username=admin&password=password1234'
+...
+* Connected to 192.168.17.1 (192.168.17.1) port 80 (#0)
+> POST /cgi-bin/login.apply HTTP/1.1
+...
+>
+< HTTP/1.0 200 OK
+< Content-Type: text/html
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="refresh" content="0;URL='/index.htm?wrongpass1'">
+...
+* Closing connection 0
+```
+
+and when trying with `user`, get redirected to `/index.htm?usernotfound`:
+```
+$  curl http://192.168.17.1/cgi-bin/login.apply -v -d 'usern
+ame=user&password=user'
+*   Trying 192.168.17.1...
+* TCP_NODELAY set
+* Connected to 192.168.17.1 (192.168.17.1) port 80 (#0)
+> POST /cgi-bin/login.apply HTTP/1.1
+> Host: 192.168.17.1
+> User-Agent: curl/7.54.0
+> Accept: */*
+> Content-Length: 27
+> Content-Type: application/x-www-form-urlencoded
+>
+* upload completely sent off: 27 out of 27 bytes
+* HTTP 1.0, assume close after body
+< HTTP/1.0 200 OK
+< Content-Type: text/html
+< Pragma: no-cache
+< Cache-Control: no-cache,must-revalidate
+< Expired: -9999
+< Vary: *
+<
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html
+4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="refresh" content="0;URL='/index.htm?usernotfound'">
+</head>
+<body style="visibility:hidden;">
+</body>
+</html>
+Set-Cookie: username=user;expire=-1;path=/
+Set-Cookie: password=user;expire=-1;path=/
+Set-Cookie: lang=en_US;expire=-1;path=/
+Set-Cookie: cookieno=388505;expire=-1;path=/
+Content-type: text/html
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html
+4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="refresh" content="0;URL='/dashboard_overview.html'">
+</head>
+<body style="visibility:hidden;">
+</body>
+</html>
+```
+
+but curiously, the `/dashboard_overview.html` route leaks. unfortunately it is just a mobile/desktop redirector:
+```
+$ curl http://192.168.17.1/dashboard_overview/
+<!DOCTYPE html >
+<html>
+<head>
+<title>Index</title>
+<script type='text/javascript' src="jquery.js" > </script>
+<script type='text/javascript' src="detectmobilebrowser.js" > </script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        if (!$.browser.mobile) {
+            window.location.href = '/index.html';
+        } else {
+            window.location.href = '/mobile.html';
+        }
+    });
+</script>
+</head>
+<body>
+</body>
+</html>
+```
+
+### 8080
 
 ```java
 //
@@ -143,15 +274,15 @@ additionally, it looks like the signature for `a` is `($IP, $SSID, $PASSWORD)`
 
 ```
 
-this is the only reference to this address, have not dug to deeply
+this is the only reference to this address, and 'goform' doesn't lead to any obvious web frameworks or patterns
 
+making recon difficult is the 'always 200' responses we see:
 
-password: 97451790c9
+```
+$ curl http://192.168.17.1:8080/goform/test
+<html><head><title>Document Error:Data follows</title></head>
+                <body><h2>Access Error:200 Data follows</h2>
+                <p>Form test is not defined</p></body></html>
+```
 
-key  | value
------|-------
-MAC  | `8C:C7:AA:02:97:48`
-SSID | `B78CC7AA029748` // so.. 'B7' + $MAC
-ID   | `TC0600008CC7AA029748` // so 'TC060000' + $MAC
-
-8CC7AA029748 in decimal is 154789178677064
+trying a few simple form names all proved to return the same response
